@@ -1,35 +1,22 @@
-import winston from "winston";
-import path from "path";
+/** Consola únicamente: en Vercel el FS es de solo lectura (Winston a archivo fallaba). */
 
-const logDir = path.join(process.cwd(), "logs");
-
-const logger = winston.createLogger({
-  level: process.env.NODE_ENV === "production" ? "info" : "debug",
-  format: winston.format.combine(
-    winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
-    winston.format.errors({ stack: true }),
-    winston.format.json()
-  ),
-  transports: [
-    new winston.transports.File({
-      filename: path.join(logDir, "error.log"),
-      level: "error",
-    }),
-    new winston.transports.File({
-      filename: path.join(logDir, "combined.log"),
-    }),
-  ],
-});
-
-if (process.env.NODE_ENV !== "production") {
-  logger.add(
-    new winston.transports.Console({
-      format: winston.format.combine(
-        winston.format.colorize(),
-        winston.format.simple()
-      ),
-    })
-  );
+function logLine(level: "log" | "warn" | "error", msg: string, meta?: Record<string, unknown>): void {
+  if (meta && Object.keys(meta).length > 0) {
+    const err = meta.error;
+    if (err instanceof Error) {
+      console[level](msg, err.message, err.stack);
+      return;
+    }
+    console[level](msg, meta);
+    return;
+  }
+  console[level](msg);
 }
+
+const logger = {
+  info: (msg: string, meta?: Record<string, unknown>) => logLine("log", msg, meta),
+  warn: (msg: string, meta?: Record<string, unknown>) => logLine("warn", msg, meta),
+  error: (msg: string, meta?: Record<string, unknown>) => logLine("error", msg, meta),
+};
 
 export default logger;

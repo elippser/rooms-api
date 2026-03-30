@@ -2,6 +2,7 @@ import express, { Application, Request, Response, NextFunction } from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
+import connectDB from "./config/dbCon";
 import logger from "./utils/logger";
 import unitRouter from "./routes/unitRouter";
 import categoryRouter from "./routes/categoryRouter";
@@ -24,13 +25,22 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   next();
 });
 
-app.use("/api/v1/public/properties", publicRouter);
-app.use("/api/v1/properties", categoryRouter);
-app.use("/api/v1/properties", unitRouter);
-
 app.get("/health", (_req: Request, res: Response) => {
   res.status(200).json({ status: "ok" });
 });
+
+app.use(async (_req: Request, _res: Response, next: NextFunction) => {
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.use("/api/v1/public/properties", publicRouter);
+app.use("/api/v1/properties", categoryRouter);
+app.use("/api/v1/properties", unitRouter);
 
 app.use((_req: Request, res: Response) => {
   logger.warn(`404 — ${_req.method} ${_req.originalUrl}`);
