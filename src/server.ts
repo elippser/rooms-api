@@ -15,7 +15,7 @@ const app: Application = express();
 app.use(
   cors({
     origin: true,
-    credentials: true,
+    credentials: false,
     methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization", "X-Access-Token"],
     maxAge: 86_400,

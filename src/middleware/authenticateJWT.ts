@@ -13,7 +13,7 @@ const authenticateJWT = (req: Request, res: Response, next: NextFunction): void 
   const token = extractAccessToken(req);
 
   if (!token) {
-    res.status(401).json({ message: "No token provided" });
+    res.status(401).json({ message: "No token provided", code: "NO_TOKEN" });
     return;
   }
 
@@ -33,7 +33,7 @@ const authenticateJWT = (req: Request, res: Response, next: NextFunction): void 
     };
     next();
   } catch {
-    res.status(401).json({ message: "Invalid or expired token" });
+    res.status(401).json({ message: "Invalid or expired token", code: "INVALID_JWT" });
   }
 };
 

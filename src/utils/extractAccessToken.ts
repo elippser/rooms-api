@@ -1,8 +1,19 @@
 import type { Request } from "express";
 
+function readQueryToken(req: Request): string | undefined {
+  if (req.method !== "GET" && req.method !== "HEAD") return undefined;
+  const q = req.query;
+  const raw =
+    (typeof q.access_token === "string" && q.access_token) ||
+    (typeof q.token === "string" && q.token);
+  if (!raw) return undefined;
+  const t = raw.trim();
+  return t || undefined;
+}
+
 /**
- * Lee el JWT de Authorization (Bearer), X-Access-Token o cookie app_token.
- * Bearer es case-insensitive; tolera espacios (algunos proxies/clientes).
+ * Lee el JWT de Authorization (Bearer), X-Access-Token, cookie app_token,
+ * o en GET/HEAD query access_token|token (fallback si el header no llega en cross-origin).
  */
 export function extractAccessToken(req: Request): string | undefined {
   const raw = req.headers.authorization;
@@ -18,5 +29,5 @@ export function extractAccessToken(req: Request): string | undefined {
   const cookie = req.cookies?.app_token;
   if (typeof cookie === "string" && cookie.trim()) return cookie.trim();
 
-  return undefined;
+  return readQueryToken(req);
 }
