@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
+import { extractAccessToken } from "../utils/extractAccessToken";
 
 interface JwtPayload {
   userId: string;
@@ -9,14 +10,7 @@ interface JwtPayload {
 }
 
 const authenticateJWT = (req: Request, res: Response, next: NextFunction): void => {
-  let token: string | undefined;
-
-  const auth = req.headers.authorization;
-  if (auth?.startsWith("Bearer ")) {
-    token = auth.slice(7);
-  } else if (req.cookies?.app_token) {
-    token = req.cookies.app_token as string;
-  }
+  const token = extractAccessToken(req);
 
   if (!token) {
     res.status(401).json({ message: "No token provided" });

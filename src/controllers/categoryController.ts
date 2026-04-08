@@ -12,14 +12,9 @@ import {
   createCategorySchema,
   updateCategorySchema,
 } from "../validations/unitSchemas";
+import { extractAccessToken } from "../utils/extractAccessToken";
 
-const getToken = (req: Request): string => {
-  const auth = req.headers.authorization;
-  if (auth?.startsWith("Bearer ")) return auth.slice(7);
-  const cookie = req.cookies?.app_token as string | undefined;
-  if (cookie) return cookie;
-  return "";
-};
+const getToken = (req: Request): string => extractAccessToken(req) ?? "";
 
 export const createCategoryHandler = catchAsync(
   async (req: Request, res: Response) => {

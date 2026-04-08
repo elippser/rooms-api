@@ -68,7 +68,6 @@ const CategorySchema = new Schema<ICategory>(
   { timestamps: true }
 );
 
-CategorySchema.index({ categoryId: 1 });
 CategorySchema.index({ propertyId: 1 });
 CategorySchema.index({ companyId: 1 });
 CategorySchema.index({ propertyId: 1, isActive: 1 });

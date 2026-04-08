@@ -21,14 +21,9 @@ import {
   changeStatusSchema,
   bulkCreateUnitsSchema,
 } from "../validations/unitSchemas";
+import { extractAccessToken } from "../utils/extractAccessToken";
 
-const getToken = (req: Request): string => {
-  const auth = req.headers.authorization;
-  if (auth?.startsWith("Bearer ")) return auth.slice(7);
-  const cookie = req.cookies?.app_token as string | undefined;
-  if (cookie) return cookie;
-  return "";
-};
+const getToken = (req: Request): string => extractAccessToken(req) ?? "";
 
 export const createUnitHandler = catchAsync(async (req: Request, res: Response) => {
   const { propertyId } = req.params;
